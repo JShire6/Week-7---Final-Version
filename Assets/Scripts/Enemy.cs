@@ -8,7 +8,11 @@ public class Enemy : MonoBehaviour {
 	public float speed = 6.0F;
 	public float jumpSpeed = 8.0F;
 	public float gravity = 20.0F;
-	private Vector3 moveDirection = Vector3.zero;
+
+    private AudioSource audioSource;
+    public AudioSource squish;
+
+    private Vector3 moveDirection = Vector3.zero;
 
 	GameObject playerGameObject; // this is a reference to the player game object
 
@@ -28,7 +32,11 @@ public class Enemy : MonoBehaviour {
 
 		// record the start direction
 		start_direction = direction;
-	}
+
+        audioSource = GetComponent<AudioSource>();
+        squish = audioSource;
+        
+    }
 
 	public void Reset()
 	{
@@ -44,8 +52,10 @@ public class Enemy : MonoBehaviour {
 		// get the character controller attached to the enemy game object
 		CharacterController controller = GetComponent<CharacterController>();
 
-		// check to see if the enemy is on the ground
-		if (controller.isGrounded) 
+        Physics.IgnoreLayerCollision(9, 10);
+
+        // check to see if the enemy is on the ground
+        if (controller.isGrounded) 
 		{
 			// set character controller moveDirection to be the direction I want the enemy to move in
 			moveDirection = direction;
@@ -71,7 +81,19 @@ public class Enemy : MonoBehaviour {
 
 			// flip the direction of the enemy
 			direction = -direction;
-		} else if (hit.collider.gameObject.CompareTag ("Player")) {
+		}
+
+        else if (hit.collider.gameObject.CompareTag("Player") & GameObject.FindGameObjectWithTag("Player").transform.position.y > GameObject.FindGameObjectWithTag("Enemy").transform.position.y + 1.5)
+        {
+            // we've hit the player
+            Destroy(this.gameObject);
+            squish.Play();
+
+
+        }
+        
+
+        else if (hit.collider.gameObject.CompareTag ("Player")) {
 			// we've hit the player
 
 			// get player script component
